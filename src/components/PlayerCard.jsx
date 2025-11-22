@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './PlayerCard.css';
 
-const PlayerCard = ({ player, onClick }) => {
+const PlayerCard = ({ player, onClick, showTeamName = false }) => {
   const [imageError, setImageError] = useState(false);
   const [imageSrc, setImageSrc] = useState(player.imageUrl);
   const [fallbackAttempted, setFallbackAttempted] = useState(false);
@@ -52,6 +52,9 @@ const PlayerCard = ({ player, onClick }) => {
         <div className="player-info">
           <h3 className="player-name">{player.name}</h3>
           <div className="player-position">{player.position}</div>
+          {showTeamName && player.teamName && (
+            <div className="player-team">{player.teamName}</div>
+          )}
         </div>
       </div>
 
