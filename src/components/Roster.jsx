@@ -50,6 +50,8 @@ const Roster = () => {
       filtered = filtered.filter(p => p.positionType === 'Infielder');
     } else if (filter === 'outfielders') {
       filtered = filtered.filter(p => p.positionType === 'Outfielder');
+    } else if (filter === 'dh') {
+      filtered = filtered.filter(p => p.position === 'DH');
     } else if (filter === 'twoWay') {
       filtered = filtered.filter(p => p.isTwoWay);
     }
@@ -166,6 +168,12 @@ const Roster = () => {
             onClick={() => setFilter('outfielders')}
           >
             Outfielders
+          </button>
+          <button
+            className={filter === 'dh' ? 'active' : ''}
+            onClick={() => setFilter('dh')}
+          >
+            DH
           </button>
           <button
             className={filter === 'twoWay' ? 'active' : ''}
