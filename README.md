@@ -61,6 +61,45 @@ This application uses the official MLB Stats API to fetch real-time roster data:
 - MLB Stats API
 - CSS3 with Gradients
 
+## Deployment
+
+This application is configured for easy deployment to multiple cloud platforms:
+
+### Deploy to Netlify
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy)
+
+1. Click the "Deploy to Netlify" button above or:
+2. Push your code to GitHub
+3. Go to [Netlify](https://app.netlify.com/)
+4. Click "Add new site" → "Import an existing project"
+5. Select your repository
+6. Netlify will automatically detect the build settings from `netlify.toml`
+7. Click "Deploy site"
+
+### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+1. Click the "Deploy with Vercel" button above or:
+2. Push your code to GitHub
+3. Go to [Vercel](https://vercel.com/)
+4. Click "Add New..." → "Project"
+5. Import your GitHub repository
+6. Vercel will automatically detect the build settings from `vercel.json`
+7. Click "Deploy"
+
+### Deploy to Other Platforms
+
+The application can also be deployed to:
+- **GitHub Pages**: Use `gh-pages` package
+- **Railway**: Direct deployment from GitHub
+- **Render**: Static site deployment
+- **Firebase Hosting**: Using Firebase CLI
+
+Build command: `npm run build`
+Output directory: `dist`
+
 ## License
 
 MIT
