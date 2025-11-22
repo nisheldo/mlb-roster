@@ -48,351 +48,395 @@ const PlayerDetail = ({ playerId, playerName, onClose }) => {
   const renderCareerStats = () => {
     if (!playerDetail?.stats) return null;
 
-    // Find career stats
-    const careerStatsGroup = playerDetail.stats.find(s =>
-      s.type.displayName === 'career'
+    // Find hitting and pitching career stats
+    const hittingCareerStats = playerDetail.stats.find(s =>
+      s.type.displayName === 'career' && s.group.displayName === 'hitting'
+    );
+    const pitchingCareerStats = playerDetail.stats.find(s =>
+      s.type.displayName === 'career' && s.group.displayName === 'pitching'
     );
 
-    if (!careerStatsGroup || !careerStatsGroup.splits || careerStatsGroup.splits.length === 0) {
+    const hasHitting = hittingCareerStats?.splits?.find(split => split.gameType === 'R')?.stat;
+    const hasPitching = pitchingCareerStats?.splits?.find(split => split.gameType === 'R')?.stat;
+
+    // Determine if two-way player (has meaningful stats in both)
+    const isTwoWay = hasHitting && hasPitching &&
+                     hasHitting.atBats > 0 &&
+                     hasPitching.inningsPitched !== '0.0';
+
+    if (!hasHitting && !hasPitching) {
       return <p className="no-data">No career stats available</p>;
     }
 
-    // Find the regular season split (gameType === 'R')
-    const regularSeasonSplit = careerStatsGroup.splits.find(split => split.gameType === 'R');
-
-    if (!regularSeasonSplit || !regularSeasonSplit.stat) {
-      return <p className="no-data">No career stats available</p>;
-    }
-
-    const stats = regularSeasonSplit.stat;
-    const isPitcher = careerStatsGroup.group.displayName === 'pitching';
-
-    if (isPitcher) {
-      return (
-        <div className="stats-table">
-          <div className="stat-row">
-            <span className="stat-label">ERA</span>
-            <span className="stat-value">{stats.era || '0.00'}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Wins-Losses</span>
-            <span className="stat-value">{stats.wins || 0}-{stats.losses || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Games</span>
-            <span className="stat-value">{stats.gamesPlayed || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Games Started</span>
-            <span className="stat-value">{stats.gamesStarted || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Innings Pitched</span>
-            <span className="stat-value">{stats.inningsPitched || '0.0'}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Strikeouts</span>
-            <span className="stat-value">{stats.strikeOuts || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Walks</span>
-            <span className="stat-value">{stats.baseOnBalls || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Saves</span>
-            <span className="stat-value">{stats.saves || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">WHIP</span>
-            <span className="stat-value">{stats.whip || '0.00'}</span>
-          </div>
+    const renderHittingStats = (stats) => (
+      <div className="stats-table">
+        <div className="stat-row">
+          <span className="stat-label">Games</span>
+          <span className="stat-value">{stats.gamesPlayed || 0}</span>
         </div>
+        <div className="stat-row">
+          <span className="stat-label">At Bats</span>
+          <span className="stat-value">{stats.atBats || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Hits</span>
+          <span className="stat-value">{stats.hits || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Batting Average</span>
+          <span className="stat-value">{stats.avg || '.000'}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Home Runs</span>
+          <span className="stat-value">{stats.homeRuns || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">RBI</span>
+          <span className="stat-value">{stats.rbi || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Runs</span>
+          <span className="stat-value">{stats.runs || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Stolen Bases</span>
+          <span className="stat-value">{stats.stolenBases || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">OBP</span>
+          <span className="stat-value">{stats.obp || '.000'}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">SLG</span>
+          <span className="stat-value">{stats.slg || '.000'}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">OPS</span>
+          <span className="stat-value">{stats.ops || '.000'}</span>
+        </div>
+      </div>
+    );
+
+    const renderPitchingStats = (stats) => (
+      <div className="stats-table">
+        <div className="stat-row">
+          <span className="stat-label">ERA</span>
+          <span className="stat-value">{stats.era || '0.00'}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Wins-Losses</span>
+          <span className="stat-value">{stats.wins || 0}-{stats.losses || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Games</span>
+          <span className="stat-value">{stats.gamesPlayed || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Games Started</span>
+          <span className="stat-value">{stats.gamesStarted || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Innings Pitched</span>
+          <span className="stat-value">{stats.inningsPitched || '0.0'}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Strikeouts</span>
+          <span className="stat-value">{stats.strikeOuts || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Walks</span>
+          <span className="stat-value">{stats.baseOnBalls || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">Saves</span>
+          <span className="stat-value">{stats.saves || 0}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">WHIP</span>
+          <span className="stat-value">{stats.whip || '0.00'}</span>
+        </div>
+      </div>
+    );
+
+    if (isTwoWay) {
+      return (
+        <>
+          <h4 style={{ fontSize: '1rem', marginTop: '1rem', marginBottom: '0.5rem' }}>Hitting</h4>
+          {renderHittingStats(hasHitting)}
+          <h4 style={{ fontSize: '1rem', marginTop: '1rem', marginBottom: '0.5rem' }}>Pitching</h4>
+          {renderPitchingStats(hasPitching)}
+        </>
       );
+    } else if (hasPitching) {
+      return renderPitchingStats(hasPitching);
     } else {
-      return (
-        <div className="stats-table">
-          <div className="stat-row">
-            <span className="stat-label">Games</span>
-            <span className="stat-value">{stats.gamesPlayed || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">At Bats</span>
-            <span className="stat-value">{stats.atBats || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Hits</span>
-            <span className="stat-value">{stats.hits || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Batting Average</span>
-            <span className="stat-value">{stats.avg || '.000'}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Home Runs</span>
-            <span className="stat-value">{stats.homeRuns || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">RBI</span>
-            <span className="stat-value">{stats.rbi || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Runs</span>
-            <span className="stat-value">{stats.runs || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Stolen Bases</span>
-            <span className="stat-value">{stats.stolenBases || 0}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">OBP</span>
-            <span className="stat-value">{stats.obp || '.000'}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">SLG</span>
-            <span className="stat-value">{stats.slg || '.000'}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">OPS</span>
-            <span className="stat-value">{stats.ops || '.000'}</span>
-          </div>
-        </div>
-      );
+      return renderHittingStats(hasHitting);
     }
   };
 
   const renderYearByYearStats = () => {
     if (!playerDetail?.stats) return null;
 
-    const yearByYearStats = playerDetail.stats.find(s =>
-      s.type.displayName === 'yearByYear'
+    const hittingYearByYear = playerDetail.stats.find(s =>
+      s.type.displayName === 'yearByYear' && s.group.displayName === 'hitting'
+    );
+    const pitchingYearByYear = playerDetail.stats.find(s =>
+      s.type.displayName === 'yearByYear' && s.group.displayName === 'pitching'
     );
 
-    if (!yearByYearStats || !yearByYearStats.splits || yearByYearStats.splits.length === 0) {
-      return <p className="no-data">No season-by-season stats available</p>;
-    }
-
-    const isPitcher = yearByYearStats.group.displayName === 'pitching';
-    // Filter for only regular season games (gameType 'R' or no gameType means regular season)
-    const seasons = yearByYearStats.splits.filter(split =>
+    const hittingSeasons = hittingYearByYear?.splits?.filter(split =>
       split.stat.gamesPlayed > 0 && (!split.gameType || split.gameType === 'R')
-    );
+    ) || [];
+    const pitchingSeasons = pitchingYearByYear?.splits?.filter(split =>
+      split.stat.gamesPlayed > 0 && (!split.gameType || split.gameType === 'R')
+    ) || [];
 
-    if (seasons.length === 0) {
+    // Determine if two-way player
+    const isTwoWay = hittingSeasons.length > 0 && pitchingSeasons.length > 0 &&
+                     hittingSeasons.some(s => s.stat.atBats > 0) &&
+                     pitchingSeasons.some(s => s.stat.inningsPitched !== '0.0');
+
+    if (hittingSeasons.length === 0 && pitchingSeasons.length === 0) {
       return <p className="no-data">No season-by-season stats available</p>;
     }
 
-    if (isPitcher) {
-      return (
-        <div className="year-by-year-table-container">
-          <table className="year-by-year-table">
-            <thead>
-              <tr>
-                <th>Year</th>
-                <th>Team</th>
-                <th>W</th>
-                <th>L</th>
-                <th>ERA</th>
-                <th>G</th>
-                <th>GS</th>
-                <th>SV</th>
-                <th>IP</th>
-                <th>H</th>
-                <th>R</th>
-                <th>ER</th>
-                <th>BB</th>
-                <th>SO</th>
-                <th>WHIP</th>
+    const renderHittingTable = (seasons) => (
+      <div className="year-by-year-table-container">
+        <table className="year-by-year-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Team</th>
+              <th>G</th>
+              <th>AB</th>
+              <th>R</th>
+              <th>H</th>
+              <th>2B</th>
+              <th>3B</th>
+              <th>HR</th>
+              <th>RBI</th>
+              <th>SB</th>
+              <th>BB</th>
+              <th>SO</th>
+              <th>AVG</th>
+              <th>OBP</th>
+              <th>SLG</th>
+              <th>OPS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {seasons.reverse().map((split, index) => (
+              <tr key={index}>
+                <td className="year-cell">{split.season}</td>
+                <td className="team-cell">{split.team?.name || 'N/A'}</td>
+                <td>{split.stat.gamesPlayed || 0}</td>
+                <td>{split.stat.atBats || 0}</td>
+                <td>{split.stat.runs || 0}</td>
+                <td>{split.stat.hits || 0}</td>
+                <td>{split.stat.doubles || 0}</td>
+                <td>{split.stat.triples || 0}</td>
+                <td>{split.stat.homeRuns || 0}</td>
+                <td>{split.stat.rbi || 0}</td>
+                <td>{split.stat.stolenBases || 0}</td>
+                <td>{split.stat.baseOnBalls || 0}</td>
+                <td>{split.stat.strikeOuts || 0}</td>
+                <td>{split.stat.avg || '.000'}</td>
+                <td>{split.stat.obp || '.000'}</td>
+                <td>{split.stat.slg || '.000'}</td>
+                <td>{split.stat.ops || '.000'}</td>
               </tr>
-            </thead>
-            <tbody>
-              {seasons.reverse().map((split, index) => (
-                <tr key={index}>
-                  <td className="year-cell">{split.season}</td>
-                  <td className="team-cell">{split.team?.name || 'N/A'}</td>
-                  <td>{split.stat.wins || 0}</td>
-                  <td>{split.stat.losses || 0}</td>
-                  <td>{split.stat.era || '0.00'}</td>
-                  <td>{split.stat.gamesPlayed || 0}</td>
-                  <td>{split.stat.gamesStarted || 0}</td>
-                  <td>{split.stat.saves || 0}</td>
-                  <td>{split.stat.inningsPitched || '0.0'}</td>
-                  <td>{split.stat.hits || 0}</td>
-                  <td>{split.stat.runs || 0}</td>
-                  <td>{split.stat.earnedRuns || 0}</td>
-                  <td>{split.stat.baseOnBalls || 0}</td>
-                  <td>{split.stat.strikeOuts || 0}</td>
-                  <td>{split.stat.whip || '0.00'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+
+    const renderPitchingTable = (seasons) => (
+      <div className="year-by-year-table-container">
+        <table className="year-by-year-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Team</th>
+              <th>W</th>
+              <th>L</th>
+              <th>ERA</th>
+              <th>G</th>
+              <th>GS</th>
+              <th>SV</th>
+              <th>IP</th>
+              <th>H</th>
+              <th>R</th>
+              <th>ER</th>
+              <th>BB</th>
+              <th>SO</th>
+              <th>WHIP</th>
+            </tr>
+          </thead>
+          <tbody>
+            {seasons.reverse().map((split, index) => (
+              <tr key={index}>
+                <td className="year-cell">{split.season}</td>
+                <td className="team-cell">{split.team?.name || 'N/A'}</td>
+                <td>{split.stat.wins || 0}</td>
+                <td>{split.stat.losses || 0}</td>
+                <td>{split.stat.era || '0.00'}</td>
+                <td>{split.stat.gamesPlayed || 0}</td>
+                <td>{split.stat.gamesStarted || 0}</td>
+                <td>{split.stat.saves || 0}</td>
+                <td>{split.stat.inningsPitched || '0.0'}</td>
+                <td>{split.stat.hits || 0}</td>
+                <td>{split.stat.runs || 0}</td>
+                <td>{split.stat.earnedRuns || 0}</td>
+                <td>{split.stat.baseOnBalls || 0}</td>
+                <td>{split.stat.strikeOuts || 0}</td>
+                <td>{split.stat.whip || '0.00'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+
+    if (isTwoWay) {
+      return (
+        <>
+          <h4 style={{ fontSize: '1rem', marginTop: '1rem', marginBottom: '0.5rem' }}>Hitting</h4>
+          {renderHittingTable(hittingSeasons)}
+          <h4 style={{ fontSize: '1rem', marginTop: '1rem', marginBottom: '0.5rem' }}>Pitching</h4>
+          {renderPitchingTable(pitchingSeasons)}
+        </>
       );
+    } else if (pitchingSeasons.length > 0) {
+      return renderPitchingTable(pitchingSeasons);
     } else {
-      return (
-        <div className="year-by-year-table-container">
-          <table className="year-by-year-table">
-            <thead>
-              <tr>
-                <th>Year</th>
-                <th>Team</th>
-                <th>G</th>
-                <th>AB</th>
-                <th>R</th>
-                <th>H</th>
-                <th>2B</th>
-                <th>3B</th>
-                <th>HR</th>
-                <th>RBI</th>
-                <th>SB</th>
-                <th>BB</th>
-                <th>SO</th>
-                <th>AVG</th>
-                <th>OBP</th>
-                <th>SLG</th>
-                <th>OPS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {seasons.reverse().map((split, index) => (
-                <tr key={index}>
-                  <td className="year-cell">{split.season}</td>
-                  <td className="team-cell">{split.team?.name || 'N/A'}</td>
-                  <td>{split.stat.gamesPlayed || 0}</td>
-                  <td>{split.stat.atBats || 0}</td>
-                  <td>{split.stat.runs || 0}</td>
-                  <td>{split.stat.hits || 0}</td>
-                  <td>{split.stat.doubles || 0}</td>
-                  <td>{split.stat.triples || 0}</td>
-                  <td>{split.stat.homeRuns || 0}</td>
-                  <td>{split.stat.rbi || 0}</td>
-                  <td>{split.stat.stolenBases || 0}</td>
-                  <td>{split.stat.baseOnBalls || 0}</td>
-                  <td>{split.stat.strikeOuts || 0}</td>
-                  <td>{split.stat.avg || '.000'}</td>
-                  <td>{split.stat.obp || '.000'}</td>
-                  <td>{split.stat.slg || '.000'}</td>
-                  <td>{split.stat.ops || '.000'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
+      return renderHittingTable(hittingSeasons);
     }
   };
 
   const renderPostseasonStats = () => {
     if (!playerDetail?.stats) return null;
 
-    // Look for yearByYear stats (which should now include both R and P gameTypes)
-    const yearByYearStats = playerDetail.stats.find(s =>
-      s.type.displayName === 'yearByYear'
+    const hittingYearByYear = playerDetail.stats.find(s =>
+      s.type.displayName === 'yearByYear' && s.group.displayName === 'hitting'
+    );
+    const pitchingYearByYear = playerDetail.stats.find(s =>
+      s.type.displayName === 'yearByYear' && s.group.displayName === 'pitching'
     );
 
-    if (!yearByYearStats || !yearByYearStats.splits || yearByYearStats.splits.length === 0) {
+    const hittingPostseason = hittingYearByYear?.splits?.filter(split =>
+      split.stat && split.stat.gamesPlayed > 0 && split.gameType === 'P'
+    ) || [];
+    const pitchingPostseason = pitchingYearByYear?.splits?.filter(split =>
+      split.stat && split.stat.gamesPlayed > 0 && split.gameType === 'P'
+    ) || [];
+
+    // Determine if two-way player in postseason
+    const isTwoWay = hittingPostseason.length > 0 && pitchingPostseason.length > 0;
+
+    if (hittingPostseason.length === 0 && pitchingPostseason.length === 0) {
       return <p className="no-data">No postseason appearances</p>;
     }
 
-    // Filter ONLY for playoff games (gameType === 'P')
-    const postseasonSeasons = yearByYearStats.splits.filter(split =>
-      split.stat &&
-      split.stat.gamesPlayed > 0 &&
-      split.gameType === 'P'
-    );
-
-    if (postseasonSeasons.length === 0) {
-      return <p className="no-data">No postseason appearances</p>;
-    }
-
-    const isPitcher = yearByYearStats.group.displayName === 'pitching';
-
-    if (isPitcher) {
-      return (
-        <div className="year-by-year-table-container">
-          <table className="year-by-year-table">
-            <thead>
-              <tr>
-                <th>Year</th>
-                <th>Team</th>
-                <th>W</th>
-                <th>L</th>
-                <th>ERA</th>
-                <th>G</th>
-                <th>GS</th>
-                <th>SV</th>
-                <th>IP</th>
-                <th>H</th>
-                <th>BB</th>
-                <th>SO</th>
+    const renderHittingPostseasonTable = (seasons) => (
+      <div className="year-by-year-table-container">
+        <table className="year-by-year-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Team</th>
+              <th>G</th>
+              <th>AB</th>
+              <th>R</th>
+              <th>H</th>
+              <th>2B</th>
+              <th>3B</th>
+              <th>HR</th>
+              <th>RBI</th>
+              <th>SB</th>
+              <th>AVG</th>
+              <th>OBP</th>
+              <th>SLG</th>
+            </tr>
+          </thead>
+          <tbody>
+            {seasons.reverse().map((split, index) => (
+              <tr key={index}>
+                <td className="year-cell">{split.season}</td>
+                <td className="team-cell">{split.team?.name || 'N/A'}</td>
+                <td>{split.stat.gamesPlayed || 0}</td>
+                <td>{split.stat.atBats || 0}</td>
+                <td>{split.stat.runs || 0}</td>
+                <td>{split.stat.hits || 0}</td>
+                <td>{split.stat.doubles || 0}</td>
+                <td>{split.stat.triples || 0}</td>
+                <td>{split.stat.homeRuns || 0}</td>
+                <td>{split.stat.rbi || 0}</td>
+                <td>{split.stat.stolenBases || 0}</td>
+                <td>{split.stat.avg || '.000'}</td>
+                <td>{split.stat.obp || '.000'}</td>
+                <td>{split.stat.slg || '.000'}</td>
               </tr>
-            </thead>
-            <tbody>
-              {postseasonSeasons.reverse().map((split, index) => (
-                <tr key={index}>
-                  <td className="year-cell">{split.season}</td>
-                  <td className="team-cell">{split.team?.name || 'N/A'}</td>
-                  <td>{split.stat.wins || 0}</td>
-                  <td>{split.stat.losses || 0}</td>
-                  <td>{split.stat.era || '0.00'}</td>
-                  <td>{split.stat.gamesPlayed || 0}</td>
-                  <td>{split.stat.gamesStarted || 0}</td>
-                  <td>{split.stat.saves || 0}</td>
-                  <td>{split.stat.inningsPitched || '0.0'}</td>
-                  <td>{split.stat.hits || 0}</td>
-                  <td>{split.stat.baseOnBalls || 0}</td>
-                  <td>{split.stat.strikeOuts || 0}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+
+    const renderPitchingPostseasonTable = (seasons) => (
+      <div className="year-by-year-table-container">
+        <table className="year-by-year-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Team</th>
+              <th>W</th>
+              <th>L</th>
+              <th>ERA</th>
+              <th>G</th>
+              <th>GS</th>
+              <th>SV</th>
+              <th>IP</th>
+              <th>H</th>
+              <th>BB</th>
+              <th>SO</th>
+            </tr>
+          </thead>
+          <tbody>
+            {seasons.reverse().map((split, index) => (
+              <tr key={index}>
+                <td className="year-cell">{split.season}</td>
+                <td className="team-cell">{split.team?.name || 'N/A'}</td>
+                <td>{split.stat.wins || 0}</td>
+                <td>{split.stat.losses || 0}</td>
+                <td>{split.stat.era || '0.00'}</td>
+                <td>{split.stat.gamesPlayed || 0}</td>
+                <td>{split.stat.gamesStarted || 0}</td>
+                <td>{split.stat.saves || 0}</td>
+                <td>{split.stat.inningsPitched || '0.0'}</td>
+                <td>{split.stat.hits || 0}</td>
+                <td>{split.stat.baseOnBalls || 0}</td>
+                <td>{split.stat.strikeOuts || 0}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+
+    if (isTwoWay) {
+      return (
+        <>
+          <h4 style={{ fontSize: '1rem', marginTop: '1rem', marginBottom: '0.5rem' }}>Hitting</h4>
+          {renderHittingPostseasonTable(hittingPostseason)}
+          <h4 style={{ fontSize: '1rem', marginTop: '1rem', marginBottom: '0.5rem' }}>Pitching</h4>
+          {renderPitchingPostseasonTable(pitchingPostseason)}
+        </>
       );
+    } else if (pitchingPostseason.length > 0) {
+      return renderPitchingPostseasonTable(pitchingPostseason);
     } else {
-      return (
-        <div className="year-by-year-table-container">
-          <table className="year-by-year-table">
-            <thead>
-              <tr>
-                <th>Year</th>
-                <th>Team</th>
-                <th>G</th>
-                <th>AB</th>
-                <th>R</th>
-                <th>H</th>
-                <th>2B</th>
-                <th>3B</th>
-                <th>HR</th>
-                <th>RBI</th>
-                <th>SB</th>
-                <th>AVG</th>
-                <th>OBP</th>
-                <th>SLG</th>
-              </tr>
-            </thead>
-            <tbody>
-              {postseasonSeasons.reverse().map((split, index) => (
-                <tr key={index}>
-                  <td className="year-cell">{split.season}</td>
-                  <td className="team-cell">{split.team?.name || 'N/A'}</td>
-                  <td>{split.stat.gamesPlayed || 0}</td>
-                  <td>{split.stat.atBats || 0}</td>
-                  <td>{split.stat.runs || 0}</td>
-                  <td>{split.stat.hits || 0}</td>
-                  <td>{split.stat.doubles || 0}</td>
-                  <td>{split.stat.triples || 0}</td>
-                  <td>{split.stat.homeRuns || 0}</td>
-                  <td>{split.stat.rbi || 0}</td>
-                  <td>{split.stat.stolenBases || 0}</td>
-                  <td>{split.stat.avg || '.000'}</td>
-                  <td>{split.stat.obp || '.000'}</td>
-                  <td>{split.stat.slg || '.000'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
+      return renderHittingPostseasonTable(hittingPostseason);
     }
   };
 
