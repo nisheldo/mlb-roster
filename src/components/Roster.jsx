@@ -43,13 +43,15 @@ const Roster = () => {
 
     // Filter by position
     if (filter === 'pitchers') {
-      filtered = filtered.filter(p => p.positionType === 'Pitcher');
+      filtered = filtered.filter(p => p.positionType === 'Pitcher' && !p.isTwoWay);
     } else if (filter === 'catchers') {
       filtered = filtered.filter(p => p.position === 'C');
     } else if (filter === 'infielders') {
       filtered = filtered.filter(p => p.positionType === 'Infielder');
     } else if (filter === 'outfielders') {
       filtered = filtered.filter(p => p.positionType === 'Outfielder');
+    } else if (filter === 'twoWay') {
+      filtered = filtered.filter(p => p.isTwoWay);
     }
 
     // Filter by search term
@@ -164,6 +166,12 @@ const Roster = () => {
             onClick={() => setFilter('outfielders')}
           >
             Outfielders
+          </button>
+          <button
+            className={filter === 'twoWay' ? 'active' : ''}
+            onClick={() => setFilter('twoWay')}
+          >
+            Two-Way
           </button>
         </div>
       </div>

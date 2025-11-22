@@ -1,18 +1,21 @@
-# MLB 40-Man Roster Viewer
+# MLB Roster Viewer
 
-A React application that displays the current 40-man rosters for all MLB teams using the official MLB Stats API.
+A modern React application that displays MLB team rosters and comprehensive player statistics using the official MLB Stats API.
 
 ## Features
 
-- Select any MLB team from a dropdown menu
-- View the complete 40-man roster for the selected team
-- Display player information including:
-  - Jersey number
-  - Full name
-  - Position
-  - Current status
-- Responsive design that works on desktop and mobile devices
-- Clean, modern UI with gradient styling
+- **All 30 MLB Teams**: Select and view rosters for any Major League Baseball team
+- **Multi-Year Support**: Access roster data from 2020-2025
+- **Comprehensive Player Stats**:
+  - Career totals and season-by-season statistics
+  - Postseason performance
+  - Awards and honors
+  - Recent transactions
+- **Smart Filtering**: Filter by position (Pitcher, Catcher, Infielder, Outfielder)
+- **Real-Time Search**: Quickly find players by name
+- **Detailed Player Profiles**: Click any player card for in-depth information
+- **Dynamic Theming**: UI adapts to selected team's official colors
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
 
 ## Getting Started
 
@@ -46,26 +49,45 @@ npm run dev
 - `npm run dev` - Start the development server
 - `npm run build` - Build the application for production
 - `npm run preview` - Preview the production build locally
+- `npm run lint` - Run ESLint to check code quality
 
 ## Data Source
 
-This application uses the official MLB Stats API to fetch real-time roster data:
-- API Endpoint: `https://statsapi.mlb.com/api/v1/teams/{teamId}/roster/40Man`
+This application uses the official MLB Stats API to fetch real-time roster and statistics data:
+- API Base: `https://statsapi.mlb.com/api/v1`
 - No API key required
-- Data updates in real-time
+- Real-time data updates
+- Endpoints for teams, rosters, player stats, awards, and transactions
 
 ## Technologies Used
 
-- React 18
-- Vite
-- MLB Stats API
-- CSS3 with Gradients
+- **React 19.2.0** - Modern React with concurrent features
+- **Vite 7.2.4** - Fast build tool and development server
+- **MLB Stats API** - Official MLB data source
+- **CSS3** - Modern styling with custom properties and gradients
+- **ESLint** - Code quality and consistency
+
+## Project Structure
+
+```
+src/
+├── api/mlbApi.js           # Centralized MLB API client
+├── components/             # React components
+│   ├── Roster.jsx         # Main container with team selection
+│   ├── PlayerCard.jsx     # Individual player cards
+│   └── PlayerDetail.jsx   # Detailed player modal
+├── hooks/useMLBData.js    # Custom data fetching hooks
+├── data/
+│   ├── teamColors.js      # Color schemes for all 30 teams
+│   └── rosterData.js      # Static data
+└── App.jsx                # Root component
+```
 
 ## Deployment
 
-This application is configured for automatic deployment to the cloud with continuous integration.
+This application is configured for automatic deployment to Netlify with continuous integration.
 
-### Auto-Deploy to Netlify (Recommended)
+### Deploy to Netlify
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy)
 
@@ -75,36 +97,19 @@ This application is configured for automatic deployment to the cloud with contin
 3. Click "Deploy site"
 
 **Auto-Deploy Features:**
-- ✅ Automatically deploys when you merge to `main` branch
-- ✅ Creates preview deployments for pull requests
-- ✅ Build status checks in GitHub
-- ✅ Automatic rollback on build failures
-- ✅ Optimized caching and CDN delivery
+- Automatically deploys when you merge to `main` branch
+- Creates preview deployments for pull requests
+- Build status checks in GitHub
+- Automatic rollback on build failures
+- Optimized caching and CDN delivery
+- Security headers configured
 
-**📖 For detailed setup instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)**
+**Configuration:**
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Deploy settings are defined in `netlify.toml`
 
-### Deploy to Vercel
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
-1. Click the "Deploy with Vercel" button above or:
-2. Push your code to GitHub
-3. Go to [Vercel](https://vercel.com/)
-4. Click "Add New..." → "Project"
-5. Import your GitHub repository
-6. Vercel will automatically detect the build settings from `vercel.json`
-7. Click "Deploy"
-
-### Deploy to Other Platforms
-
-The application can also be deployed to:
-- **GitHub Pages**: Use `gh-pages` package
-- **Railway**: Direct deployment from GitHub
-- **Render**: Static site deployment
-- **Firebase Hosting**: Using Firebase CLI
-
-Build command: `npm run build`
-Output directory: `dist`
+**For detailed setup instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)**
 
 ## License
 

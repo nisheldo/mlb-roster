@@ -171,37 +171,65 @@ export const mlbApi = {
     // Determine if player is a pitcher
     const isPitcher = position.type === 'Pitcher';
 
-    // Extract stats based on player type
+    // Extract stats - check for both hitting and pitching stats
     let stats = {};
+    let hittingStats = null;
+    let pitchingStats = null;
+    let isTwoWay = false;
+
     if (statsData && statsData.stats) {
-      const seasonStats = statsData.stats.find(s =>
+      // Try to find hitting stats
+      const hittingSeasonStats = statsData.stats.find(s =>
         s.type.displayName === 'season' &&
-        s.group.displayName === (isPitcher ? 'pitching' : 'hitting')
+        s.group.displayName === 'hitting'
       );
 
-      if (seasonStats && seasonStats.splits && seasonStats.splits.length > 0) {
-        const statData = seasonStats.splits[0].stat;
+      // Try to find pitching stats
+      const pitchingSeasonStats = statsData.stats.find(s =>
+        s.type.displayName === 'season' &&
+        s.group.displayName === 'pitching'
+      );
 
-        if (isPitcher) {
-          stats = {
-            era: statData.era || '0.00',
-            wins: statData.wins || 0,
-            losses: statData.losses || 0,
-            strikeouts: statData.strikeOuts || 0,
-            innings: statData.inningsPitched || '0.0',
-            saves: statData.saves || 0,
-            games: statData.gamesPlayed || 0
-          };
-        } else {
-          stats = {
-            avg: statData.avg || '.000',
-            homeRuns: statData.homeRuns || 0,
-            rbi: statData.rbi || 0,
-            ops: statData.ops || '.000',
-            games: statData.gamesPlayed || 0,
-            hits: statData.hits || 0
-          };
-        }
+      // Extract hitting stats if available
+      if (hittingSeasonStats && hittingSeasonStats.splits && hittingSeasonStats.splits.length > 0) {
+        const statData = hittingSeasonStats.splits[0].stat;
+        hittingStats = {
+          avg: statData.avg || '.000',
+          homeRuns: statData.homeRuns || 0,
+          rbi: statData.rbi || 0,
+          ops: statData.ops || '.000',
+          games: statData.gamesPlayed || 0,
+          hits: statData.hits || 0,
+          atBats: statData.atBats || 0
+        };
+      }
+
+      // Extract pitching stats if available
+      if (pitchingSeasonStats && pitchingSeasonStats.splits && pitchingSeasonStats.splits.length > 0) {
+        const statData = pitchingSeasonStats.splits[0].stat;
+        pitchingStats = {
+          era: statData.era || '0.00',
+          wins: statData.wins || 0,
+          losses: statData.losses || 0,
+          strikeouts: statData.strikeOuts || 0,
+          innings: statData.inningsPitched || '0.0',
+          saves: statData.saves || 0,
+          games: statData.gamesPlayed || 0
+        };
+      }
+
+      // Determine if player is two-way (has both hitting and pitching stats with meaningful games)
+      isTwoWay = hittingStats && pitchingStats &&
+                 hittingStats.atBats > 0 &&
+                 pitchingStats.innings !== '0.0';
+
+      // Set primary stats based on player type
+      if (isTwoWay) {
+        stats = { hitting: hittingStats, pitching: pitchingStats };
+      } else if (isPitcher && pitchingStats) {
+        stats = pitchingStats;
+      } else if (hittingStats) {
+        stats = hittingStats;
       }
     }
 
@@ -211,6 +239,7 @@ export const mlbApi = {
       number: rosterPlayer.jerseyNumber || '00',
       position: position.abbreviation,
       positionType: position.type,
+      isTwoWay,
       bats: statsData?.batSide?.code || 'R',
       throws: statsData?.pitchHand?.code || 'R',
       height: statsData?.height || 'N/A',

@@ -6,10 +6,11 @@ const PlayerCard = ({ player, onClick }) => {
   const [imageSrc, setImageSrc] = useState(player.imageUrl);
   const [fallbackAttempted, setFallbackAttempted] = useState(false);
 
-  const isPitcher = player.positionType === 'Pitcher' ||
+  const isPitcher = (player.positionType === 'Pitcher' ||
                     player.position === 'SP' ||
                     player.position === 'RP' ||
-                    player.position.includes('SP/RP');
+                    player.position.includes('SP/RP')) &&
+                    !player.isTwoWay;
 
   // Reset image state when player data changes
   useEffect(() => {
@@ -71,7 +72,48 @@ const PlayerCard = ({ player, onClick }) => {
 
       <div className="player-stats">
         <h4>{player.year} Stats</h4>
-        {isPitcher ? (
+        {player.isTwoWay ? (
+          <>
+            <h5 style={{ fontSize: '0.85rem', marginTop: '0.5rem', marginBottom: '0.5rem', color: 'var(--team-accent)' }}>Hitting</h5>
+            <div className="stats-grid">
+              <div className="stat">
+                <div className="stat-label">AVG</div>
+                <div className="stat-value">{player.stats.hitting.avg}</div>
+              </div>
+              <div className="stat">
+                <div className="stat-label">HR</div>
+                <div className="stat-value">{player.stats.hitting.homeRuns}</div>
+              </div>
+              <div className="stat">
+                <div className="stat-label">RBI</div>
+                <div className="stat-value">{player.stats.hitting.rbi}</div>
+              </div>
+              <div className="stat">
+                <div className="stat-label">OPS</div>
+                <div className="stat-value">{player.stats.hitting.ops}</div>
+              </div>
+            </div>
+            <h5 style={{ fontSize: '0.85rem', marginTop: '0.75rem', marginBottom: '0.5rem', color: 'var(--team-accent)' }}>Pitching</h5>
+            <div className="stats-grid">
+              <div className="stat">
+                <div className="stat-label">ERA</div>
+                <div className="stat-value">{player.stats.pitching.era}</div>
+              </div>
+              <div className="stat">
+                <div className="stat-label">W-L</div>
+                <div className="stat-value">{player.stats.pitching.wins}-{player.stats.pitching.losses}</div>
+              </div>
+              <div className="stat">
+                <div className="stat-label">K</div>
+                <div className="stat-value">{player.stats.pitching.strikeouts}</div>
+              </div>
+              <div className="stat">
+                <div className="stat-label">IP</div>
+                <div className="stat-value">{player.stats.pitching.innings}</div>
+              </div>
+            </div>
+          </>
+        ) : isPitcher ? (
           <div className="stats-grid">
             <div className="stat">
               <div className="stat-label">ERA</div>
