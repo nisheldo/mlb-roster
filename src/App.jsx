@@ -3,36 +3,36 @@ import './App.css'
 import PlayerStatsModal from './components/PlayerStatsModal'
 
 const MLB_TEAMS = [
-  { id: 109, name: 'Arizona Diamondbacks' },
-  { id: 144, name: 'Atlanta Braves' },
-  { id: 110, name: 'Baltimore Orioles' },
-  { id: 111, name: 'Boston Red Sox' },
-  { id: 112, name: 'Chicago Cubs' },
-  { id: 145, name: 'Chicago White Sox' },
-  { id: 113, name: 'Cincinnati Reds' },
-  { id: 114, name: 'Cleveland Guardians' },
-  { id: 115, name: 'Colorado Rockies' },
-  { id: 116, name: 'Detroit Tigers' },
-  { id: 117, name: 'Houston Astros' },
-  { id: 118, name: 'Kansas City Royals' },
-  { id: 108, name: 'Los Angeles Angels' },
-  { id: 119, name: 'Los Angeles Dodgers' },
-  { id: 146, name: 'Miami Marlins' },
-  { id: 158, name: 'Milwaukee Brewers' },
-  { id: 142, name: 'Minnesota Twins' },
-  { id: 121, name: 'New York Mets' },
-  { id: 147, name: 'New York Yankees' },
-  { id: 133, name: 'Oakland Athletics' },
-  { id: 143, name: 'Philadelphia Phillies' },
-  { id: 134, name: 'Pittsburgh Pirates' },
-  { id: 135, name: 'San Diego Padres' },
-  { id: 137, name: 'San Francisco Giants' },
-  { id: 136, name: 'Seattle Mariners' },
-  { id: 138, name: 'St. Louis Cardinals' },
-  { id: 139, name: 'Tampa Bay Rays' },
-  { id: 140, name: 'Texas Rangers' },
-  { id: 141, name: 'Toronto Blue Jays' },
-  { id: 120, name: 'Washington Nationals' },
+  { id: 109, name: 'Arizona Diamondbacks', primaryColor: '#A71930', secondaryColor: '#E3D4AD' },
+  { id: 144, name: 'Atlanta Braves', primaryColor: '#CE1141', secondaryColor: '#13274F' },
+  { id: 110, name: 'Baltimore Orioles', primaryColor: '#DF4601', secondaryColor: '#000000' },
+  { id: 111, name: 'Boston Red Sox', primaryColor: '#BD3039', secondaryColor: '#0C2340' },
+  { id: 112, name: 'Chicago Cubs', primaryColor: '#0E3386', secondaryColor: '#CC3433' },
+  { id: 145, name: 'Chicago White Sox', primaryColor: '#27251F', secondaryColor: '#C4CED4' },
+  { id: 113, name: 'Cincinnati Reds', primaryColor: '#C6011F', secondaryColor: '#000000' },
+  { id: 114, name: 'Cleveland Guardians', primaryColor: '#0C2340', secondaryColor: '#E31937' },
+  { id: 115, name: 'Colorado Rockies', primaryColor: '#33006F', secondaryColor: '#C4CED4' },
+  { id: 116, name: 'Detroit Tigers', primaryColor: '#0C2340', secondaryColor: '#FA4616' },
+  { id: 117, name: 'Houston Astros', primaryColor: '#002D62', secondaryColor: '#EB6E1F' },
+  { id: 118, name: 'Kansas City Royals', primaryColor: '#004687', secondaryColor: '#BD9B60' },
+  { id: 108, name: 'Los Angeles Angels', primaryColor: '#BA0021', secondaryColor: '#003263' },
+  { id: 119, name: 'Los Angeles Dodgers', primaryColor: '#005A9C', secondaryColor: '#EF3E42' },
+  { id: 146, name: 'Miami Marlins', primaryColor: '#00A3E0', secondaryColor: '#EF3340' },
+  { id: 158, name: 'Milwaukee Brewers', primaryColor: '#12284B', secondaryColor: '#FFC52F' },
+  { id: 142, name: 'Minnesota Twins', primaryColor: '#002B5C', secondaryColor: '#D31145' },
+  { id: 121, name: 'New York Mets', primaryColor: '#002D72', secondaryColor: '#FF5910' },
+  { id: 147, name: 'New York Yankees', primaryColor: '#0C2340', secondaryColor: '#C4CED4' },
+  { id: 133, name: 'Oakland Athletics', primaryColor: '#003831', secondaryColor: '#EFB21E' },
+  { id: 143, name: 'Philadelphia Phillies', primaryColor: '#E81828', secondaryColor: '#002D72' },
+  { id: 134, name: 'Pittsburgh Pirates', primaryColor: '#27251F', secondaryColor: '#FDB827' },
+  { id: 135, name: 'San Diego Padres', primaryColor: '#2F241D', secondaryColor: '#FFC425' },
+  { id: 137, name: 'San Francisco Giants', primaryColor: '#FD5A1E', secondaryColor: '#27251F' },
+  { id: 136, name: 'Seattle Mariners', primaryColor: '#0C2C56', secondaryColor: '#005C5C' },
+  { id: 138, name: 'St. Louis Cardinals', primaryColor: '#C41E3A', secondaryColor: '#0C2340' },
+  { id: 139, name: 'Tampa Bay Rays', primaryColor: '#092C5C', secondaryColor: '#8FBCE6' },
+  { id: 140, name: 'Texas Rangers', primaryColor: '#003278', secondaryColor: '#C0111F' },
+  { id: 141, name: 'Toronto Blue Jays', primaryColor: '#134A8E', secondaryColor: '#1D2D5C' },
+  { id: 120, name: 'Washington Nationals', primaryColor: '#AB0003', secondaryColor: '#14225A' },
 ];
 
 function App() {
@@ -71,14 +71,32 @@ function App() {
     }
   };
 
-  const selectedTeamName = MLB_TEAMS.find(t => t.id.toString() === selectedTeam)?.name || '';
+  const selectedTeamData = MLB_TEAMS.find(t => t.id.toString() === selectedTeam);
+  const selectedTeamName = selectedTeamData?.name || '';
+  const teamColors = {
+    primary: selectedTeamData?.primaryColor || '#1e3a8a',
+    secondary: selectedTeamData?.secondaryColor || '#1e40af'
+  };
 
   return (
-    <div className="app">
+    <div className="app" style={{
+      background: `linear-gradient(135deg, ${teamColors.primary} 0%, ${teamColors.secondary} 100%)`
+    }}>
       <div className="container">
-        <header className="header">
-          <h1>⚾ MLB 40-Man Rosters</h1>
-          <p>Select a team to view their current 40-man roster</p>
+        <header className="header" style={{
+          background: `linear-gradient(135deg, ${teamColors.primary} 0%, ${teamColors.secondary} 100%)`
+        }}>
+          {selectedTeam && (
+            <img
+              src={`https://www.mlbstatic.com/team-logos/${selectedTeam}.svg`}
+              alt={selectedTeamName}
+              className="team-logo"
+            />
+          )}
+          <div className="header-text">
+            <h1>{selectedTeamName || 'MLB 40-Man Rosters'}</h1>
+            <p>40-Man Roster</p>
+          </div>
         </header>
 
         <div className="content">
@@ -107,8 +125,12 @@ function App() {
 
           {!loading && !error && roster.length > 0 && (
             <>
-              <div className="roster-count">
-                {selectedTeamName} - {roster.length} Players on 40-Man Roster
+              <div className="roster-count" style={{
+                background: `${teamColors.primary}15`,
+                color: teamColors.primary,
+                borderLeft: `4px solid ${teamColors.primary}`
+              }}>
+                {roster.length} Players on 40-Man Roster
               </div>
 
               <div className="roster-grid">
