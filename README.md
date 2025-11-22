@@ -63,19 +63,25 @@ This application uses the official MLB Stats API to fetch real-time roster data:
 
 ## Deployment
 
-This application is configured for easy deployment to multiple cloud platforms:
+This application is configured for automatic deployment to the cloud with continuous integration.
 
-### Deploy to Netlify
+### Auto-Deploy to Netlify (Recommended)
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy)
 
-1. Click the "Deploy to Netlify" button above or:
-2. Push your code to GitHub
-3. Go to [Netlify](https://app.netlify.com/)
-4. Click "Add new site" → "Import an existing project"
-5. Select your repository
-6. Netlify will automatically detect the build settings from `netlify.toml`
-7. Click "Deploy site"
+**Quick Setup:**
+1. Click the "Deploy to Netlify" button above
+2. Authorize GitHub access and select this repository
+3. Click "Deploy site"
+
+**Auto-Deploy Features:**
+- ✅ Automatically deploys when you merge to `main` branch
+- ✅ Creates preview deployments for pull requests
+- ✅ Build status checks in GitHub
+- ✅ Automatic rollback on build failures
+- ✅ Optimized caching and CDN delivery
+
+**📖 For detailed setup instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)**
 
 ### Deploy to Vercel
 
