@@ -76,6 +76,31 @@ test.describe('Core Functionality', () => {
     expect(playerCards).toBeGreaterThan(0);
   });
 
+  test('should support historical years (1910+)', async ({ page }) => {
+    await waitForRosterLoad(page);
+
+    // Verify year selector includes historical years
+    const yearSelect = page.locator('#year-select');
+    const options = await yearSelect.locator('option').allTextContents();
+
+    // Should include earliest year (1910)
+    expect(options).toContain(TEST_YEARS.EARLIEST);
+
+    // Should include a representative historical year
+    expect(options).toContain(TEST_YEARS.HISTORICAL);
+
+    // Test loading a historical year
+    await selectYear(page, TEST_YEARS.HISTORICAL);
+
+    // Verify year changed in subtitle
+    const subtitle = await page.locator('.roster-subtitle').textContent();
+    expect(subtitle).toContain(TEST_YEARS.HISTORICAL);
+
+    // Verify roster data loaded successfully from historical year
+    const playerCards = await page.locator('.player-card').count();
+    expect(playerCards).toBeGreaterThan(0);
+  });
+
   test('should show all filter buttons', async ({ page }) => {
     await waitForRosterLoad(page);
 
