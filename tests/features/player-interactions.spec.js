@@ -78,8 +78,8 @@ test.describe('Player Interactions', () => {
   test('should close player detail modal when backdrop clicked', async ({ page }) => {
     await openPlayerDetail(page, 0);
 
-    // Click backdrop
-    await page.click('.player-detail-overlay');
+    // Click backdrop area (outside modal) - click near top-left corner
+    await page.click('.player-detail-overlay', { position: { x: 10, y: 10 } });
 
     // Modal should be hidden
     await page.waitForSelector('.player-detail-modal', { state: 'hidden' });
