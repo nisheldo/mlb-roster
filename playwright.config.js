@@ -20,7 +20,9 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   /* Reporter to use */
-  reporter: 'html',
+  reporter: process.env.CI
+    ? [['github'], ['html']]  // CI: GitHub Actions annotations + HTML report
+    : 'html',                   // Local: HTML report only
 
   /* Shared settings for all the projects below */
   use: {

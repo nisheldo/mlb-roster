@@ -31,6 +31,21 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
+      - name: Add test results summary
+        if: always()
+        run: |
+          echo "## Test Results :test_tube:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f playwright-report/index.html ]; then
+            echo "✅ Tests completed. View detailed HTML report in artifacts below." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Quick Stats:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Browser: Chromium (optimized for CI speed)" >> $GITHUB_STEP_SUMMARY
+            echo "- Full multi-browser tests available locally with \`npm test\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed to complete" >> $GITHUB_STEP_SUMMARY
+          fi
+
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
         if: always()
