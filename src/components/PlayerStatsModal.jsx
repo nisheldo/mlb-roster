@@ -113,8 +113,10 @@ function PlayerStatsModal({ player, onClose }) {
             src={`https://img.mlb.com/mlb/images/players/head_shot/${player.person.id}.jpg`}
             alt={player.person.fullName}
             className="modal-player-photo"
+            loading="lazy"
             onError={(e) => {
-              e.target.style.display = 'none';
+              const initials = player.person.fullName.split(' ').map(n => n[0]).join('').substring(0,2);
+              e.target.src = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"%3E%3Ccircle fill="%23e5e7eb" cx="60" cy="60" r="60"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="40" fill="%239ca3af"%3E${initials}%3C/text%3E%3C/svg%3E`;
             }}
           />
           <div className="modal-header-text">
