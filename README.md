@@ -50,6 +50,20 @@ npm run dev
 - `npm run build` - Build the application for production
 - `npm run preview` - Preview the production build locally
 - `npm run lint` - Run ESLint to check code quality
+- `npm test` - Run E2E tests with Playwright
+- `npm run test:ui` - Run tests in interactive UI mode
+- `npm run test:report` - View HTML test report
+
+## Testing
+
+This project includes comprehensive end-to-end tests using Playwright that automatically validate:
+- Core functionality (team/year selection, roster loading)
+- All position filters (Pitchers, Catchers, Infielders, Outfielders, DH, Two-Way)
+- Player interactions (search, detail modal, stats display)
+- Two-way player features (dual stat display)
+- DH filter functionality
+
+Tests run automatically on every PR via GitHub Actions. See [tests/README.md](tests/README.md) for detailed testing documentation.
 
 ## Data Source
 
