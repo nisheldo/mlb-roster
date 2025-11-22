@@ -29,7 +29,9 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        id: playwright
         run: npx playwright test
+        continue-on-error: true
 
       - name: Add test results summary
         if: always()
@@ -45,6 +47,41 @@ jobs:
           else
             echo "❌ Tests failed to complete" >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Post test results to PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const testsPassed = '${{ steps.playwright.outcome }}' === 'success';
+
+            const comment = `## 🎭 Playwright Test Results
+
+            ${testsPassed ? '✅ All tests passed!' : '❌ Some tests failed'}
+
+            **Browser:** Chromium (optimized for CI speed)
+            **Status:** ${testsPassed ? 'PASSED ✓' : 'FAILED ✗'}
+
+            ${testsPassed ? '' : '⚠️ **Action Required:** Check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for failure details.'}
+
+            📊 **View Full Report:**
+            - Download the \`playwright-report\` artifact from the [workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Unzip and open \`index.html\` for interactive results with screenshots and traces
+
+            💡 **Run locally:** \`npm test\` (tests all browsers: Chrome, Firefox, Safari)
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Fail workflow if tests failed
+        if: steps.playwright.outcome == 'failure'
+        run: exit 1
 
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
