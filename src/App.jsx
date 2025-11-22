@@ -120,15 +120,18 @@ function App() {
                   >
                     <div className="player-photo-wrapper">
                       <img
-                        src={`https://content.mlb.com/images/headshots/current/60x60/${player.person.id}.png`}
+                        src={`https://img.mlb.com/mlb/images/players/head_shot/${player.person.id}@2x.jpg`}
                         alt={player.person.fullName}
                         className="player-photo"
                         loading="lazy"
                         onError={(e) => {
-                          // Try alternate URL format
-                          if (e.target.src.includes('content.mlb.com')) {
+                          // Try standard resolution
+                          if (e.target.src.includes('@2x')) {
                             e.target.src = `https://img.mlb.com/mlb/images/players/head_shot/${player.person.id}.jpg`;
                           } else if (e.target.src.includes('img.mlb.com')) {
+                            // Try content.mlb.com
+                            e.target.src = `https://content.mlb.com/images/headshots/current/60x60/${player.person.id}.png`;
+                          } else {
                             // Fall back to initials
                             const initials = player.person.fullName.split(' ').map(n => n[0]).join('').substring(0,2);
                             e.target.src = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="60" fill="%239ca3af"%3E${initials}%3C/text%3E%3C/svg%3E`;
