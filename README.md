@@ -5,7 +5,7 @@ A modern React application that displays MLB team rosters and comprehensive play
 ## Features
 
 - **All 30 MLB Teams**: Select and view rosters for any Major League Baseball team
-- **Multi-Year Support**: Access roster data from 2020-2025
+- **Multi-Year Support**: Access roster data from 2000-2025
 - **Comprehensive Player Stats**:
   - Career totals and season-by-season statistics
   - Postseason performance

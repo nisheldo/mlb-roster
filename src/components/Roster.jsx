@@ -11,8 +11,11 @@ const Roster = () => {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchAllTeams, setSearchAllTeams] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
+  const [allTeamsPlayers, setAllTeamsPlayers] = useState([]);
+  const [allTeamsLoading, setAllTeamsLoading] = useState(false);
 
   const { teams, loading: teamsLoading } = useMLBTeams();
   const { players, loading, error } = useTeamRoster(selectedTeamId, selectedYear);
@@ -28,6 +31,54 @@ const Roster = () => {
     document.documentElement.style.setProperty('--team-accent', colors.accent);
   }, [selectedTeamId]);
 
+  // Fetch all teams' rosters when searching across all teams
+  useEffect(() => {
+    const fetchAllTeamsPlayers = async () => {
+      if (!searchAllTeams || !searchTerm || searchTerm.length < 2) {
+        setAllTeamsPlayers([]);
+        return;
+      }
+
+      setAllTeamsLoading(true);
+      try {
+        const { mlbApi } = await import('../api/mlbApi');
+
+        // Fetch rosters from all teams
+        const allPlayersPromises = teams.map(async (team) => {
+          try {
+            const roster = await mlbApi.getTeamRoster(team.id, selectedYear);
+            const playersWithStats = await Promise.all(
+              roster.map(async (rosterPlayer) => {
+                try {
+                  const statsData = await mlbApi.getPlayerStats(rosterPlayer.person.id, selectedYear);
+                  const playerData = mlbApi.formatPlayerData(rosterPlayer, statsData, selectedYear);
+                  // Add team info to player
+                  return { ...playerData, teamName: team.name, teamId: team.id };
+                } catch (error) {
+                  return null;
+                }
+              })
+            );
+            return playersWithStats.filter(p => p !== null);
+          } catch (error) {
+            console.error(`Failed to fetch roster for ${team.name}:`, error);
+            return [];
+          }
+        });
+
+        const allTeamsRosters = await Promise.all(allPlayersPromises);
+        const flatPlayers = allTeamsRosters.flat();
+        setAllTeamsPlayers(flatPlayers);
+      } catch (error) {
+        console.error('Error fetching all teams players:', error);
+      } finally {
+        setAllTeamsLoading(false);
+      }
+    };
+
+    fetchAllTeamsPlayers();
+  }, [searchAllTeams, searchTerm, teams, selectedYear]);
+
   const handlePlayerClick = (playerId, playerName) => {
     setSelectedPlayerId(playerId);
     setSelectedPlayerName(playerName);
@@ -39,25 +90,36 @@ const Roster = () => {
   };
 
   const getFilteredPlayers = () => {
-    let filtered = players;
+    // Use all teams players if searching across all teams
+    let filtered = searchAllTeams && searchTerm ? allTeamsPlayers : players;
 
-    // Filter by position
-    if (filter === 'pitchers') {
-      filtered = filtered.filter(p => p.positionType === 'Pitcher' && !p.isTwoWay);
-    } else if (filter === 'catchers') {
-      filtered = filtered.filter(p => p.position === 'C');
-    } else if (filter === 'infielders') {
-      filtered = filtered.filter(p => p.positionType === 'Infielder');
-    } else if (filter === 'outfielders') {
-      filtered = filtered.filter(p => p.positionType === 'Outfielder');
-    } else if (filter === 'dh') {
-      filtered = filtered.filter(p => p.position === 'DH');
-    } else if (filter === 'twoWay') {
-      filtered = filtered.filter(p => p.isTwoWay);
+    // Only apply position filters when not searching all teams
+    if (!searchAllTeams) {
+      // Filter by position
+      if (filter === 'pitchers') {
+        filtered = filtered.filter(p => p.positionType === 'Pitcher' && !p.isTwoWay);
+      } else if (filter === 'catchers') {
+        filtered = filtered.filter(p => p.position === 'C');
+      } else if (filter === 'infielders') {
+        filtered = filtered.filter(p => p.positionType === 'Infielder');
+      } else if (filter === 'outfielders') {
+        filtered = filtered.filter(p => p.positionType === 'Outfielder');
+      } else if (filter === 'dh') {
+        filtered = filtered.filter(p => p.position === 'DH');
+      } else if (filter === 'twoWay') {
+        filtered = filtered.filter(p => p.isTwoWay);
+      }
     }
 
-    // Filter by search term
-    if (searchTerm) {
+    // Filter by search term (for current team search)
+    if (searchTerm && !searchAllTeams) {
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by search term (for all teams - already filtered in the effect)
+    if (searchTerm && searchAllTeams) {
       filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -68,9 +130,9 @@ const Roster = () => {
 
   const filteredPlayers = getFilteredPlayers();
 
-  // Generate year options (2020 to current year)
+  // Generate year options (2000 to current year)
   const yearOptions = [];
-  for (let year = currentYear; year >= 2020; year--) {
+  for (let year = currentYear; year >= 2000; year--) {
     yearOptions.push(year);
   }
 
@@ -131,11 +193,21 @@ const Roster = () => {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search by player name..."
+            placeholder={searchAllTeams ? "Search all MLB teams..." : "Search by player name..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
+          <div className="search-all-teams-checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={searchAllTeams}
+                onChange={(e) => setSearchAllTeams(e.target.checked)}
+              />
+              <span>Search all teams</span>
+            </label>
+          </div>
         </div>
 
         <div className="filter-buttons">
@@ -184,10 +256,10 @@ const Roster = () => {
         </div>
       </div>
 
-      {loading && (
+      {(loading || allTeamsLoading) && (
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>Loading roster data...</p>
+          <p>{allTeamsLoading ? 'Searching all teams...' : 'Loading roster data...'}</p>
         </div>
       )}
 
@@ -198,21 +270,24 @@ const Roster = () => {
         </div>
       )}
 
-      {!loading && !error && (
+      {!loading && !allTeamsLoading && !error && (
         <>
           <div className="roster-grid">
             {filteredPlayers.map(player => (
               <PlayerCard
-                key={player.id}
+                key={`${player.id}-${player.teamId || selectedTeamId}`}
                 player={player}
+                showTeamName={searchAllTeams}
                 onClick={() => handlePlayerClick(player.id, player.name)}
               />
             ))}
           </div>
 
-          {filteredPlayers.length === 0 && players.length > 0 && (
+          {filteredPlayers.length === 0 && (players.length > 0 || searchAllTeams) && (
             <div className="no-results">
-              No players found matching your criteria.
+              {searchAllTeams && searchTerm.length < 2
+                ? 'Enter at least 2 characters to search all teams'
+                : 'No players found matching your criteria.'}
             </div>
           )}
         </>

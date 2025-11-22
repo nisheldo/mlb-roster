@@ -133,3 +133,54 @@ export const TEST_YEARS = {
   CURRENT: new Date().getFullYear().toString(),
   LAST_YEAR: (new Date().getFullYear() - 1).toString(),
 };
+
+/**
+ * Enable or disable search all teams mode
+ * @param {import('@playwright/test').Page} page
+ * @param {boolean} enabled - true to enable, false to disable
+ */
+export async function toggleSearchAllTeams(page, enabled) {
+  const checkbox = page.locator('.search-all-teams-checkbox input[type="checkbox"]');
+  if (enabled) {
+    await checkbox.check();
+  } else {
+    await checkbox.uncheck();
+  }
+  await page.waitForTimeout(300);
+}
+
+/**
+ * Search all teams for a player
+ * @param {import('@playwright/test').Page} page
+ * @param {string} searchTerm
+ */
+export async function searchAllTeams(page, searchTerm) {
+  await toggleSearchAllTeams(page, true);
+  await page.fill('.search-input', searchTerm);
+
+  // Wait for loading to complete or timeout
+  await page.waitForSelector('.loading-container', { state: 'hidden', timeout: 60000 });
+}
+
+/**
+ * Check if a player card shows team name
+ * @param {import('@playwright/test').Locator} card
+ * @returns {Promise<boolean>}
+ */
+export async function hasTeamNameVisible(card) {
+  const teamName = card.locator('.player-team');
+  return await teamName.isVisible();
+}
+
+/**
+ * Get team name from a player card
+ * @param {import('@playwright/test').Locator} card
+ * @returns {Promise<string|null>}
+ */
+export async function getTeamName(card) {
+  const teamName = card.locator('.player-team');
+  if (await teamName.isVisible()) {
+    return await teamName.textContent();
+  }
+  return null;
+}

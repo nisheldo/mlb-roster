@@ -85,6 +85,13 @@
   margin-top: 4px;
 }
 
+.player-team {
+  color: #666;
+  font-size: 13px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
 .player-details {
   margin-bottom: 15px;
 }
