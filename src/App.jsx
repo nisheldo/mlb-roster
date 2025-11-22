@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import PlayerStatsModal from './components/PlayerStatsModal'
 
 const MLB_TEAMS = [
   { id: 109, name: 'Arizona Diamondbacks' },
@@ -39,6 +40,7 @@ function App() {
   const [roster, setRoster] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   useEffect(() => {
     if (selectedTeam) {
@@ -111,7 +113,11 @@ function App() {
 
               <div className="roster-grid">
                 {roster.map((player) => (
-                  <div key={player.person.id} className="player-card">
+                  <div
+                    key={player.person.id}
+                    className="player-card"
+                    onClick={() => setSelectedPlayer(player)}
+                  >
                     <div className="player-name">
                       #{player.jerseyNumber || '--'} {player.person.fullName}
                     </div>
@@ -127,6 +133,7 @@ function App() {
                         </div>
                       )}
                     </div>
+                    <div className="click-hint">Click for stats →</div>
                   </div>
                 ))}
               </div>
@@ -140,6 +147,13 @@ function App() {
           )}
         </div>
       </div>
+
+      {selectedPlayer && (
+        <PlayerStatsModal
+          player={selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      )}
     </div>
   );
 }
