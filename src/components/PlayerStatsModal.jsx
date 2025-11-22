@@ -110,8 +110,18 @@ function PlayerStatsModal({ player, onClose }) {
         <button className="modal-close" onClick={onClose}>&times;</button>
 
         <div className="modal-header">
-          <h2>#{player.jerseyNumber || '--'} {player.person.fullName}</h2>
-          <p className="player-position">{player.position.name}</p>
+          <img
+            src={`https://img.mlb.com/mlb/images/players/head_shot/${player.person.id}.jpg`}
+            alt={player.person.fullName}
+            className="modal-player-photo"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          <div className="modal-header-text">
+            <h2>#{player.jerseyNumber || '--'} {player.person.fullName}</h2>
+            <p className="player-position">{player.position.name}</p>
+          </div>
         </div>
 
         {loading && <div className="modal-loading">Loading stats...</div>}

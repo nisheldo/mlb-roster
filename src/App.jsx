@@ -36,7 +36,7 @@ const MLB_TEAMS = [
 ];
 
 function App() {
-  const [selectedTeam, setSelectedTeam] = useState('147'); // Default to Yankees
+  const [selectedTeam, setSelectedTeam] = useState('142'); // Default to Twins
   const [roster, setRoster] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -118,6 +118,14 @@ function App() {
                     className="player-card"
                     onClick={() => setSelectedPlayer(player)}
                   >
+                    <img
+                      src={`https://img.mlb.com/mlb/images/players/head_shot/${player.person.id}.jpg`}
+                      alt={player.person.fullName}
+                      className="player-photo"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
                     <div className="player-name">
                       #{player.jerseyNumber || '--'} {player.person.fullName}
                     </div>
