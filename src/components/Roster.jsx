@@ -130,9 +130,9 @@ const Roster = () => {
 
   const filteredPlayers = getFilteredPlayers();
 
-  // Generate year options (2000 to current year)
+  // Generate year options (1910 to current year - MLB API has 40-man roster data from 1910 onwards)
   const yearOptions = [];
-  for (let year = currentYear; year >= 2000; year--) {
+  for (let year = currentYear; year >= 1910; year--) {
     yearOptions.push(year);
   }
 
