@@ -35,10 +35,9 @@ export const mlbApi = {
    */
   async getTeamRoster(teamId = DEFAULT_TEAM_ID, season = new Date().getFullYear()) {
     try {
-      // For current year, use 40Man roster, for past years use active roster
-      const rosterType = season === new Date().getFullYear() ? '40Man' : 'active';
+      // 40-man roster data is available from 1910 onwards
       const response = await fetch(
-        `${MLB_API_BASE}/teams/${teamId}/roster/${rosterType}?season=${season}`
+        `${MLB_API_BASE}/teams/${teamId}/roster/40Man?season=${season}`
       );
       if (!response.ok) throw new Error('Failed to fetch roster');
       const data = await response.json();

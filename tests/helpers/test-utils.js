@@ -132,6 +132,8 @@ export const TEST_TEAMS = {
 export const TEST_YEARS = {
   CURRENT: new Date().getFullYear().toString(),
   LAST_YEAR: (new Date().getFullYear() - 1).toString(),
+  HISTORICAL: '2010', // Representative historical year for testing
+  EARLIEST: '1910', // Earliest year with 40-man roster data
 };
 
 /**
